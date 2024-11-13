@@ -593,10 +593,6 @@ local function toggleSpam()
 		-- Turn on
 		isSpamActive = true
 		spamButton.Text = "Auto farm Active"
-
-		while task.wait(0.3) do
-		hrm.Anchored = true
-		end
 		
 		-- Setup platform and position
 		local newPosition = Vector3.new(5000, 5000, 0)
@@ -608,6 +604,12 @@ local function toggleSpam()
 
 		-- Start key and click spamming in separate thread
 		autoFarmThread = task.spawn(spamKeysAndClick)
+
+		task.wait(0.5)
+
+		while task.wait(0.3) do
+		hrm.Anchored = true
+		end
 	end
 end
 
