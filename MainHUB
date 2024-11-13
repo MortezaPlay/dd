@@ -553,9 +553,10 @@ end
 -- Separate function for spamming keys and clicking
 local function spamKeysAndClick()
 	while isSpamActive do
+		hrm.Anchored = true
 		simulateKeyPressAndClick(keySequence[keyIndex])
 		keyIndex = (keyIndex % #keySequence) + 1
-		task.wait(0.25)  -- Interval between key and click spam
+		task.wait(0.28)  -- Interval between key and click spam
 	end
 end
 
