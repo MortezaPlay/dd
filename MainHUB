@@ -588,6 +588,8 @@ local function toggleSpam()
 			autoFarmThread = nil
 		end
 		cleanupPlatform()
+
+		-- Un-anchor player when deactivating
 		hrm.Anchored = false
 	else
 		-- Turn on
@@ -599,17 +601,18 @@ local function toggleSpam()
 		local platformPosition = newPosition - Vector3.new(0, character.Humanoid.HipHeight + 7, 0)
 		createPlatform(platformPosition)
 
-		-- Use safe teleport instead of direct CFrame setting
+		-- Use safe teleport
 		teleportPlayer(CFrame.new(newPosition))
+
+		-- Anchor the player once they've been teleported
+		hrm.Anchored = true
 
 		-- Start key and click spamming in separate thread
 		autoFarmThread = task.spawn(spamKeysAndClick)
 
-		task.wait(0.5)
-
-		while task.wait(0.3) do
+		-- Keep the player anchored after teleportation
+		task.wait(0.5)  -- Give some time for teleportation to complete
 		hrm.Anchored = true
-		end
 	end
 end
 
