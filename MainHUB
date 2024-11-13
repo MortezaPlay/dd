@@ -553,7 +553,6 @@ end
 -- Separate function for spamming keys and clicking
 local function spamKeysAndClick()
 	while isSpamActive do
-		hrm.Anchored = true
 		simulateKeyPressAndClick(keySequence[keyIndex])
 		keyIndex = (keyIndex % #keySequence) + 1
 		task.wait(0.28)  -- Interval between key and click spam
@@ -595,6 +594,10 @@ local function toggleSpam()
 		isSpamActive = true
 		spamButton.Text = "Auto farm Active"
 
+		while task.wait(0.3) do
+		hrm.Anchored = true
+		end
+		
 		-- Setup platform and position
 		local newPosition = Vector3.new(5000, 5000, 0)
 		local platformPosition = newPosition - Vector3.new(0, character.Humanoid.HipHeight + 7, 0)
