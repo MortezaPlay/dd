@@ -1,0 +1,1074 @@
+-- Script COPYRIGHTED to | @tx.mor on DISCORD
+
+local Players = game:GetService("Players")
+local TweenService = game:GetService("TweenService")
+local UserInputService = game:GetService("UserInputService")
+local VirtualInputManager = game:GetService("VirtualInputManager")
+local RunService = game:GetService("RunService")
+local player = Players.LocalPlayer
+local character = player.Character or player.CharacterAdded:Wait()
+
+-- Screen dimensions for center clicking
+local viewport = workspace.CurrentCamera.ViewportSize
+local screenCenter = Vector2.new(viewport.X / 2, viewport.Y / 2)
+
+-- Key system URLs and links
+local keyUrl = "https://pastefy.app/kllhZD4T/raw"  -- URL to fetch the key
+local keyLink = "https://work.ink/1WZL/m38ctbyj"
+local discordLink = "https://discord.gg/23TMQnGBh3"
+local validKey
+
+-- Function to fetch the key from the URL
+local function fetchKey()
+	local success, keyResponse = pcall(function()
+		return game:HttpGet(keyUrl)
+	end)
+	if success and keyResponse then
+		validKey = keyResponse
+	else
+		warn("Failed to retrieve the valid key from URL.")
+	end
+end
+
+fetchKey()  -- Call this to set validKey at the start
+
+-- Create key system GUI elements
+local keySystemGui = Instance.new("ScreenGui")
+local keyFrame = Instance.new("Frame")
+local keyLabel = Instance.new("TextLabel")
+local keyInput = Instance.new("TextBox")
+keySystemGui.ResetOnSpawn = false
+keySystemGui.Name = "KeySystemGui"
+keySystemGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
+keySystemGui.DisplayOrder = 17
+
+-- Main frame with dragging functionality
+keyFrame.Name = "KeyFrame"
+keyFrame.Size = UDim2.new(0, 350, 0, 280)
+keyFrame.Position = UDim2.new(0.5, -175, 0.5, -140)
+keyFrame.BackgroundColor3 = Color3.fromRGB(28, 30, 38)
+keyFrame.BorderSizePixel = 0
+
+-- Dragging functionality
+local dragging = false
+local dragStart
+local startPos
+
+keyFrame.InputBegan:Connect(function(input)
+	if input.UserInputType == Enum.UserInputType.MouseButton1 then
+		dragging = true
+		dragStart = input.Position
+		startPos = keyFrame.Position
+	end
+end)
+
+UserInputService.InputChanged:Connect(function(input)
+	if dragging and input.UserInputType == Enum.UserInputType.MouseMovement then
+		local delta = input.Position - dragStart
+		keyFrame.Position = UDim2.new(
+			startPos.X.Scale,
+			startPos.X.Offset + delta.X,
+			startPos.Y.Scale,
+			startPos.Y.Offset + delta.Y
+		)
+	end
+end)
+
+UserInputService.InputEnded:Connect(function(input)
+	if input.UserInputType == Enum.UserInputType.MouseButton1 then
+		dragging = false
+	end
+end)
+
+-- Add close button
+local closeButton = Instance.new("TextButton")
+closeButton.Name = "CloseButton"
+closeButton.Size = UDim2.new(0, 30, 0, 30)
+closeButton.Position = UDim2.new(1, -40, 0, 10)
+closeButton.BackgroundColor3 = Color3.fromRGB(255, 85, 85)
+closeButton.Text = "×"
+closeButton.TextColor3 = Color3.fromRGB(248, 248, 242)
+closeButton.TextSize = 24
+closeButton.Font = Enum.Font.GothamBold
+closeButton.Parent = keyFrame
+
+local closeButtonCorner = Instance.new("UICorner")
+closeButtonCorner.CornerRadius = UDim.new(0, 15)
+closeButtonCorner.Parent = closeButton
+
+-- Title bar
+local titleBar = Instance.new("TextLabel")
+titleBar.Name = "TitleBar"
+titleBar.Size = UDim2.new(1, -50, 0, 50)
+titleBar.Position = UDim2.new(0, 0, 0, 0)
+titleBar.BackgroundTransparency = 1
+titleBar.Text = "Key System"
+titleBar.TextColor3 = Color3.fromRGB(248, 248, 242)
+titleBar.TextSize = 24
+titleBar.Font = Enum.Font.GothamBold
+titleBar.Parent = keyFrame
+
+local keyFrameCorner = Instance.new("UICorner")
+keyFrameCorner.CornerRadius = UDim.new(0, 15)
+keyFrameCorner.Parent = keyFrame
+
+keyLabel.Name = "KeyLabel"
+keyLabel.Size = UDim2.new(1, 0, 0, 50)
+keyLabel.Position = UDim2.new(0, 0, 0, 50)
+keyLabel.BackgroundTransparency = 1
+keyLabel.Text = "Enter the key to unlock the GUI:"
+keyLabel.TextColor3 = Color3.fromRGB(248, 248, 242)
+keyLabel.TextSize = 18
+keyLabel.Font = Enum.Font.GothamSemibold
+keyLabel.Parent = keyFrame
+
+-- Key input field
+keyInput.Name = "KeyInput"
+keyInput.Text = ""
+keyInput.Size = UDim2.new(0.8, 0, 0, 40)
+keyInput.Position = UDim2.new(0.1, 0, 0, 110)
+keyInput.BackgroundColor3 = Color3.fromRGB(68, 71, 90)
+keyInput.TextColor3 = Color3.fromRGB(248, 248, 242)
+keyInput.TextSize = 16
+keyInput.Font = Enum.Font.GothamSemibold
+keyInput.PlaceholderText = "Enter key here"
+keyInput.ClearTextOnFocus = false
+keyInput.TextScaled = true
+keyInput.Parent = keyFrame
+
+local InputTextSize = Instance.new("UITextSizeConstraint")
+InputTextSize.MaxTextSize = 25
+InputTextSize.Parent = keyInput
+
+local keyInputCorner = Instance.new("UICorner")
+keyInputCorner.CornerRadius = UDim.new(0, 10)
+keyInputCorner.Parent = keyInput
+
+-- Button container
+local buttonContainer = Instance.new("Frame")
+buttonContainer.Name = "ButtonContainer"
+buttonContainer.Size = UDim2.new(0.9, 0, 0, 40)
+buttonContainer.Position = UDim2.new(0.05, 0, 0, 170)
+buttonContainer.BackgroundTransparency = 1
+buttonContainer.Parent = keyFrame
+
+-- Create buttons
+local function createButton(name, text, position, size, color)
+	local button = Instance.new("TextButton")
+	button.Name = name
+	button.Size = size
+	button.Position = position
+	button.BackgroundColor3 = color
+	button.TextColor3 = Color3.fromRGB(248, 248, 242)
+	button.TextSize = 18
+	button.Font = Enum.Font.GothamSemibold
+	button.Text = text
+	button.Parent = buttonContainer
+
+	local corner = Instance.new("UICorner")
+	corner.CornerRadius = UDim.new(0, 10)
+	corner.Parent = button
+
+	button.MouseEnter:Connect(function()
+		TweenService:Create(button, TweenInfo.new(0.2), {BackgroundColor3 = Color3.fromRGB(78, 81, 100)}):Play()
+	end)
+	button.MouseLeave:Connect(function()
+		TweenService:Create(button, TweenInfo.new(0.2), {BackgroundColor3 = color}):Play()
+	end)
+
+	return button
+end
+
+local copyLinkButton = createButton("CopyLinkButton", "Get Key", UDim2.new(0, 0, 0, 0), UDim2.new(0.3, -10, 1, 0), Color3.fromRGB(68, 71, 90))
+local discordButton = createButton("DiscordButton", "Discord", UDim2.new(0.7, 0, 0, 0), UDim2.new(0.3, -10, 1, 0), Color3.fromRGB(68, 71, 90))
+local submitButton = createButton("SubmitButton", "Submit", UDim2.new(0.3, 0, -0.05, 0), UDim2.new(0.4, -10, 1.1, 0), Color3.fromRGB(133, 140, 176))
+
+-- Status label
+local statusLabel = Instance.new("TextLabel")
+statusLabel.Name = "StatusLabel"
+statusLabel.Size = UDim2.new(0.8, 0, 0, 30)
+statusLabel.Position = UDim2.new(0.1, 0, 0, 230)
+statusLabel.BackgroundTransparency = 1
+statusLabel.TextColor3 = Color3.fromRGB(255, 85, 85)
+statusLabel.TextSize = 14
+statusLabel.Font = Enum.Font.GothamSemibold
+statusLabel.Text = ""
+statusLabel.Parent = keyFrame
+
+-- Function to show/hide main GUI
+local function toggleMainGUI(show)
+	local mainGui = player.PlayerGui:FindFirstChild("DraculaHubScreenGUI")
+	if mainGui then
+		local mainFrame = mainGui:FindFirstChild("DraculaHubGUI")
+		if mainFrame then
+			mainFrame.Visible = show
+		end
+	end
+end
+
+-- Button functionality
+closeButton.MouseButton1Click:Connect(function()
+	keySystemGui:Destroy()
+	local newKeySystem = script.Parent:Clone()
+	newKeySystem.Parent = player.PlayerGui
+end)
+
+copyLinkButton.MouseButton1Click:Connect(function()
+	if setclipboard then
+		setclipboard(keyLink)
+		statusLabel.TextColor3 = Color3.fromRGB(80, 250, 123)
+		statusLabel.Text = "Link copied to clipboard!"
+		copyLinkButton.Text = "Copied!"
+		wait(2)
+		copyLinkButton.Text = "Get Key"
+		statusLabel.Text = ""
+	else
+		statusLabel.TextColor3 = Color3.fromRGB(255, 85, 85)
+		statusLabel.Text = "Clipboard copying not supported!"
+		wait(2)
+		statusLabel.Text = ""
+	end
+end)
+
+discordButton.MouseButton1Click:Connect(function()
+	if setclipboard then
+		setclipboard(discordLink)
+		statusLabel.TextColor3 = Color3.fromRGB(80, 250, 123)
+		statusLabel.Text = "Discord link copied to clipboard!"
+		discordButton.Text = "Copied!"
+		wait(2)
+		discordButton.Text = "Discord"
+		statusLabel.Text = ""
+	else
+		statusLabel.TextColor3 = Color3.fromRGB(255, 85, 85)
+		statusLabel.Text = "Clipboard copying not supported!"
+		wait(2)
+		statusLabel.Text = ""
+	end
+end)
+
+submitButton.MouseButton1Click:Connect(function()
+	if keyInput.Text == validKey then
+		statusLabel.TextColor3 = Color3.fromRGB(80, 250, 123)
+		statusLabel.Text = "Success! Loading GUI..."
+		task.wait(1)
+		toggleMainGUI(true)
+		keySystemGui:Destroy()
+	else
+		statusLabel.TextColor3 = Color3.fromRGB(255, 85, 85)
+		statusLabel.Text = "Invalid key!"
+		wait(2)
+		statusLabel.Text = ""
+	end
+end)
+
+-- Parent the GUI to PlayerGui
+keyFrame.Parent = keySystemGui
+keySystemGui.Parent = player.PlayerGui
+
+-- Hide main GUI initially
+toggleMainGUI(false)
+
+
+--Main GUI
+local player = game.Players.LocalPlayer
+local character = player.Character or player.CharacterAdded:Wait()
+local playerGui = player.PlayerGui
+local UserInputService = game:GetService("UserInputService")
+local RunService = game:GetService("RunService")
+local TweenService = game:GetService("TweenService")
+local VirtualInputManager = game:GetService("VirtualInputManager")
+
+-- Create main GUI elements
+local gui = Instance.new("ScreenGui")
+local mainFrame = Instance.new("Frame")
+local topBar = Instance.new("Frame")
+local title = Instance.new("TextLabel")
+local closeButton = Instance.new("ImageButton")
+local creditsLabel = Instance.new("TextLabel")
+local separator = Instance.new("Frame")
+local separator2 = Instance.new("Frame")
+local spamButton = Instance.new("TextButton")
+local speedButton = Instance.new("TextButton")
+local jumpButton = Instance.new("TextButton")
+local redeemCodesButton = Instance.new("TextButton")
+local healthRegenButton = Instance.new("TextButton")
+local teleportButton = Instance.new("TextButton")
+local fruitsDropdownButton = Instance.new("TextButton")
+
+gui.ResetOnSpawn = false
+gui.Name = "DraculaHubScreenGUI"
+gui.IgnoreGuiInset = true
+gui.DisplayOrder = 16
+
+-- Style the main frame with a Dracula-inspired theme
+mainFrame.Name = "DraculaHubGUI"
+mainFrame.Size = UDim2.new(0.2, 0, 0.545, 0)
+mainFrame.Position = UDim2.new(0.5, -175, 0.5, -200)
+mainFrame.BackgroundColor3 = Color3.fromRGB(28, 30, 38) -- Dracula background
+mainFrame.BorderSizePixel = 0
+mainFrame.Active = true
+mainFrame.Draggable = true
+mainFrame.Visible = false -- Hide the main GUI initially
+
+-- Style the top bar with a sleek, dark theme
+topBar.Size = UDim2.new(1, 0, 0, 50)
+topBar.BackgroundColor3 = Color3.fromRGB(35, 37, 49) -- Darker top bar
+topBar.BorderSizePixel = 0
+
+-- Title styled with a vibrant, gradient text
+title.Size = UDim2.new(1, -30, 1, 0)
+title.Position = UDim2.new(0, 10, 0, 0)
+title.BackgroundTransparency = 1
+title.Text = "Dracula Hub"
+title.TextColor3 = Color3.fromRGB(168, 114, 244) -- Vibrant purple gradient
+title.TextSize = 20
+title.Font = Enum.Font.GothamBold
+title.TextXAlignment = Enum.TextXAlignment.Left
+
+-- Close button styled with a sleek, circular design
+closeButton.Size = UDim2.new(0, 35, 0, 35)
+closeButton.Position = UDim2.new(1, -40, 0.5, -17.5)
+closeButton.BackgroundTransparency = 1
+closeButton.Image = "rbxassetid://7072725342" -- Close icon
+closeButton.ImageColor3 = Color3.fromRGB(200, 200, 200)
+
+-- Credits section at the bottom
+creditsLabel.Size = UDim2.new(1, 0, 0, 20)
+creditsLabel.Position = UDim2.new(0, 0, 0.94, 0)
+creditsLabel.BackgroundTransparency = 1
+creditsLabel.Text = "by: tx.mor | on Discord"
+creditsLabel.TextColor3 = Color3.fromRGB(150, 150, 150)
+creditsLabel.TextSize = 16
+creditsLabel.Font = Enum.Font.GothamBold
+creditsLabel.TextXAlignment = Enum.TextXAlignment.Center
+
+-- Separator line between buttons and credits
+separator.Size = UDim2.new(0.9, 0, 0.005, 0)
+separator.Position = UDim2.new(0.05, 0, 0.435, 0, 0)
+separator.BackgroundColor3 = Color3.fromRGB(100, 100, 100)
+separator.BorderSizePixel = 0
+
+-- Separator line between buttons and credits
+separator2.Size = UDim2.new(0.9, 0, 0.005, 0)
+separator2.Position = UDim2.new(0.05, 0, 0.695, 0, 0)
+separator2.BackgroundColor3 = Color3.fromRGB(100, 100, 100)
+separator2.BorderSizePixel = 0
+
+-- Style for each button with a Dracula-inspired theme
+local TweenService = game:GetService("TweenService")
+
+local function styleButton(button, text, Pos, isExempt)
+	button.Size = UDim2.new(0.9, 0, 0, 50)
+	button.Position = Pos
+	button.BackgroundColor3 = Color3.fromRGB(68, 71, 90) -- Dracula button color
+	button.TextColor3 = Color3.fromRGB(248, 248, 242) -- Dracula text color
+	button.TextSize = 18
+	button.Font = Enum.Font.GothamSemibold
+	button.BorderSizePixel = 0
+
+	local buttonCorner = Instance.new("UICorner")
+	buttonCorner.CornerRadius = UDim.new(0, 10)
+	buttonCorner.Parent = button
+
+	-- Track whether the button is active
+	local isActive = false
+
+	-- Button hover effect
+	button.MouseEnter:Connect(function()
+		if not isActive and not isExempt then -- Only apply hover effect if the button is not active and is not exempt
+			TweenService:Create(button, TweenInfo.new(0.2), {BackgroundColor3 = Color3.fromRGB(78, 81, 100)}):Play()
+		end
+	end)
+	button.MouseLeave:Connect(function()
+		if not isActive and not isExempt then -- Only revert hover effect if the button is not active and is not exempt
+			TweenService:Create(button, TweenInfo.new(0.2), {BackgroundColor3 = Color3.fromRGB(68, 71, 90)}):Play()
+		end
+	end)
+
+	-- Button click effect
+	local function toggleButtonColor()
+		if isExempt then return end -- Don't apply color toggle if the button is exempt
+		isActive = not isActive
+		local targetColor = isActive and Color3.fromRGB(80, 200, 120) or Color3.fromRGB(68, 71, 90)
+		TweenService:Create(button, TweenInfo.new(0.2), {BackgroundColor3 = targetColor}):Play()
+	end
+
+	button.MouseButton1Click:Connect(function()
+		toggleButtonColor()
+	end)
+
+	button.Text = text
+end
+
+-- Call styleButton with an additional argument `isExempt` for the redeemCodesButton
+styleButton(spamButton, "Auto farm", UDim2.new(0.05, 0, 0.005, 75))
+styleButton(speedButton, "Speed Boost", UDim2.new(0.05, 0, 0.045, 250))
+styleButton(jumpButton, "Jump Boost", UDim2.new(0.05, 0, 0.05, 310))
+styleButton(redeemCodesButton, "Redeem All Codes", UDim2.new(0.05, 0, 0.075, 145), true)
+styleButton(healthRegenButton, "Health Regen", UDim2.new(0.05, 0, 0.082, 380))
+styleButton(teleportButton, "Teleport", UDim2.new(0.05, 0, 0.088, 440))
+styleButton(fruitsDropdownButton, "Spin Fruits", UDim2.new(0.05, 0, 0.005, 130))
+
+-- Add rounded corners to main frames
+local mainCorner = Instance.new("UICorner")
+mainCorner.CornerRadius = UDim.new(0, 15)
+mainCorner.Parent = mainFrame
+
+local topCorner = Instance.new("UICorner")
+topCorner.CornerRadius = UDim.new(0, 15)
+topCorner.Parent = topBar
+
+-- Parent elements to build structure
+topBar.Parent = mainFrame
+title.Parent = topBar
+closeButton.Parent = topBar
+creditsLabel.Parent = mainFrame
+separator.Parent = mainFrame
+separator2.Parent = mainFrame
+spamButton.Parent = mainFrame
+speedButton.Parent = mainFrame
+jumpButton.Parent = mainFrame
+redeemCodesButton.Parent = mainFrame
+healthRegenButton.Parent = mainFrame
+teleportButton.Parent = mainFrame
+fruitsDropdownButton.Parent = mainFrame
+mainFrame.Parent = gui
+gui.Parent = playerGui
+
+-- Track states
+local isSpeedBoostActive = false
+local isJumpBoostActive = false
+local isSpamActive = false
+local spamLoop
+
+local character = game.Players.LocalPlayer.Character or game.Players.LocalPlayer.CharacterAdded:Wait()
+local isSpeedBoostActive = false
+local isJumpBoostActive = false
+
+-- Ensure buttons reset correctly
+local function updateSpeedBoost(humanoid)
+	if isSpeedBoostActive then
+		humanoid.WalkSpeed = 200
+		speedButton.Text = "Speed Boost Active"
+	else
+		humanoid.WalkSpeed = 16
+		speedButton.Text = "Speed Boost"
+	end
+end
+
+local function updateJumpBoost(humanoid)
+	if isJumpBoostActive then
+		humanoid.JumpPower = 200
+		jumpButton.Text = "Jump Boost Active"
+	else
+		humanoid.JumpPower = 50
+		jumpButton.Text = "Jump Boost"
+	end
+end
+
+-- Toggle speed boost
+local function toggleSpeedBoost()
+	local humanoid = character:WaitForChild("Humanoid")
+	isSpeedBoostActive = not isSpeedBoostActive
+	updateSpeedBoost(humanoid)
+
+	if isSpeedBoostActive then
+		spawn(function()
+			while isSpeedBoostActive and humanoid.Parent do
+				humanoid.WalkSpeed = 200
+				wait(0.1)
+			end
+		end)
+	end
+end
+
+-- Toggle jump boost
+local function toggleJumpBoost()
+	local humanoid = character:WaitForChild("Humanoid")
+	isJumpBoostActive = not isJumpBoostActive
+	updateJumpBoost(humanoid)
+
+	if isJumpBoostActive then
+		spawn(function()
+			while isJumpBoostActive and humanoid.Parent do
+				humanoid.JumpPower = 200
+				wait(0.1)
+			end
+		end)
+	end
+end
+
+-- Reset boosts on respawn
+game.Players.LocalPlayer.CharacterAdded:Connect(function(newCharacter)
+	character = newCharacter
+	local humanoid = character:WaitForChild("Humanoid")
+	updateSpeedBoost(humanoid)
+	updateJumpBoost(humanoid)
+end)
+
+local keySequence = {Enum.KeyCode.One, Enum.KeyCode.Two, Enum.KeyCode.Three, Enum.KeyCode.Four, Enum.KeyCode.Five, Enum.KeyCode.Six, Enum.KeyCode.Seven, Enum.KeyCode.Eight}
+local keyIndex = 1
+local isSpamActive = false
+local autoFarmThread
+
+-- Optimize click simulation with pre-calculated position
+local screenSize = workspace.CurrentCamera.ViewportSize
+local clickPos = Vector2.new(
+	screenSize.X * 0.95,
+	screenSize.Y * 0.95
+)
+
+-- Optimized simulation functions
+local function simulateClick()
+	VirtualInputManager:SendMouseButtonEvent(clickPos.X, clickPos.Y, 0, true, game, 0)
+	VirtualInputManager:SendMouseButtonEvent(clickPos.X, clickPos.Y, 0, false, game, 0)
+end
+
+local function simulateKeyPressAndClick(keyCode)
+	-- Press the key and click right after
+	VirtualInputManager:SendKeyEvent(true, keyCode, false, game)
+	VirtualInputManager:SendKeyEvent(false, keyCode, false, game)
+	simulateClick()
+end
+
+-- Platform management functions
+local function createPlatform(position)
+	local part = Instance.new("Part")
+	part.Name = "AutoFarmPlatform"
+	part.Size = Vector3.new(100, 1, 100)
+	part.Position = position
+	part.Anchored = true
+	part.Parent = workspace
+	return part
+end
+
+local function cleanupPlatform()
+	local platform = workspace:FindFirstChild("AutoFarmPlatform")
+	if platform then
+		platform:Destroy()
+	end
+end
+
+-- Separate function for spamming keys and clicking
+local function spamKeysAndClick()
+	while isSpamActive do
+		simulateKeyPressAndClick(keySequence[keyIndex])
+		keyIndex = (keyIndex % #keySequence) + 1
+		task.wait(0.25)  -- Interval between key and click spam
+	end
+end
+
+-- Function to safely teleport player
+local function teleportPlayer(position)
+	local player = game.Players.LocalPlayer
+	if not player then return end
+
+	local character = player.Character or player.CharacterAdded:Wait()
+	local humanoidRootPart = character:FindFirstChild("HumanoidRootPart")
+	if humanoidRootPart then
+		humanoidRootPart.CFrame = position
+	end
+end
+
+-- Main toggle function with safe teleport
+local function toggleSpam()
+	local character = game.Players.LocalPlayer.Character
+	if not character then return end
+
+	local hrm = character:WaitForChild("HumanoidRootPart")
+	if not hrm then return end
+
+	if isSpamActive then
+		-- Turn off
+		isSpamActive = false
+		spamButton.Text = "Auto farm"
+		if autoFarmThread then
+			task.cancel(autoFarmThread)
+			autoFarmThread = nil
+		end
+		cleanupPlatform()
+		hrm.Anchored = false
+	else
+		-- Turn on
+		isSpamActive = true
+		spamButton.Text = "Auto farm Active"
+
+		-- Setup platform and position
+		local newPosition = Vector3.new(5000, 5000, 0)
+		local platformPosition = newPosition - Vector3.new(0, character.Humanoid.HipHeight + 7, 0)
+		createPlatform(platformPosition)
+
+		-- Use safe teleport instead of direct CFrame setting
+		teleportPlayer(CFrame.new(newPosition))
+
+		-- Start key and click spamming in separate thread
+		autoFarmThread = task.spawn(spamKeysAndClick)
+	end
+end
+
+-- Emergency stop hotkey
+UserInputService.InputBegan:Connect(function(input, gameProcessed)
+	if input.KeyCode == Enum.KeyCode.P and isSpamActive then
+		toggleSpam()
+	end
+end)
+
+-- Cleanup on character respawn
+game.Players.LocalPlayer.CharacterAdded:Connect(function(newCharacter)
+	character = newCharacter
+	if isSpamActive then
+		-- Toggle spam to reapply the anchored state and position the player correctly
+		toggleSpam()
+		toggleSpam() -- Double call ensures proper restart in case of respawn
+	end
+end)
+
+
+--redeem Codes function
+local function redeemCodesFunc()
+	for _, k in pairs(game.Players:GetChildren()) do
+		for _, v in pairs(k["MAIN_DATA"].Codes:GetChildren()) do
+			print(v.Value)
+			local ohString1 = "Codes"
+			local ohString2 = "Redeem"
+			local ohTable3 = {
+				["Code"] = v.Value,
+			}
+
+			game:GetService("ReplicatedStorage").Replicator:InvokeServer(ohString1, ohString2, ohTable3)
+		end
+	end
+end
+
+-- Enhanced Health Regen Feature with Server Resistance Handling
+local isHealthRegenActive = false
+local baseRegenAmount = 700
+local regenAmount = baseRegenAmount
+local regenInterval = 0.1
+local maxRegenAmount = 1300
+local regenIncreaseRate = 5000
+local cooldown = 1.5
+
+local desiredHealth = 0 -- Tracks intended health to counter server resistance
+local lastToggleTime = 0
+
+local function toggleHealthRegen()
+	if tick() - lastToggleTime < cooldown then
+		return
+	end
+	lastToggleTime = tick()
+
+	isHealthRegenActive = not isHealthRegenActive
+	if isHealthRegenActive then
+		healthRegenButton.Text = "Health Regen Active"
+		spawn(function()
+			while isHealthRegenActive do
+				if character and character:FindFirstChild("Humanoid") then
+					local humanoid = character.Humanoid
+					-- Only regenerate if health is less than max health
+					if humanoid.Health < humanoid.MaxHealth then
+						-- Calculate the intended health after regeneration
+						local regenThisTick = math.min(regenAmount, humanoid.MaxHealth - humanoid.Health)
+						desiredHealth = math.min(humanoid.MaxHealth, humanoid.Health + regenThisTick)
+
+						-- Set health to desired amount to counter server resistance
+						humanoid.Health = desiredHealth
+
+						-- Increase regen amount over time, capped at maxRegenAmount
+						regenAmount = math.min(maxRegenAmount, regenAmount + regenIncreaseRate)
+					else
+						-- Reset regen amount to base when fully healed
+						regenAmount = baseRegenAmount
+						desiredHealth = humanoid.MaxHealth -- Update desired health to max
+					end
+				end
+				-- Periodically check and correct health if it's being resisted by the server
+				if character and character:FindFirstChild("Humanoid") and isHealthRegenActive then
+					local humanoid = character.Humanoid
+					if humanoid.Health < desiredHealth then
+						humanoid.Health = desiredHealth -- Forcefully set to desired health
+					end
+				end
+				wait(regenInterval)
+			end
+		end)
+	else
+		healthRegenButton.Text = "Health Regen"
+		regenAmount = baseRegenAmount
+		desiredHealth = 0 -- Reset desired health
+	end
+end
+
+-- Define teleport dropdown frame
+local dropdownFrame = Instance.new("Frame")
+dropdownFrame.Size = UDim2.new(0.9, 0,0.3, 0) 
+dropdownFrame.Position = UDim2.new(1.02, 0,0.78, 0)
+dropdownFrame.BackgroundColor3 = Color3.fromRGB(35, 37, 49)
+dropdownFrame.BorderSizePixel = 0
+dropdownFrame.Visible = false
+
+local dropdownCorner = Instance.new("UICorner")
+dropdownCorner.CornerRadius = UDim.new(0.15, 0)
+dropdownCorner.Parent = dropdownFrame
+
+-- Add a UIListLayout to organize buttons vertically
+local listLayout = Instance.new("UIListLayout")
+listLayout.Parent = dropdownFrame
+listLayout.SortOrder = Enum.SortOrder.LayoutOrder
+listLayout.HorizontalAlignment = Enum.HorizontalAlignment.Center
+listLayout.VerticalAlignment = Enum.VerticalAlignment.Center
+listLayout.Padding = UDim.new(0.04, 0)
+
+-- Function to safely teleport player
+local function teleportPlayer(position)
+	local player = game.Players.LocalPlayer
+	if not player then return end
+
+	local character = player.Character or player.CharacterAdded:Wait()
+	local humanoidRootPart = character:FindFirstChild("HumanoidRootPart")
+
+	if humanoidRootPart then
+		humanoidRootPart.CFrame = position
+	end
+end
+
+-- Predefined locations (using CFrame for proper teleportation)
+local locations = {
+	["Marco Boss Spawn"] = CFrame.new(-856.22, 960.18, 442.76),
+	["Colosseum"] = CFrame.new(506.42, 742.67, 802.55),
+	["Second Sea Teleporter"] = CFrame.new(1143.21, 733.25, 1014.47)
+}
+
+-- Function to create a teleport button
+local function createLocationButton(name, position)
+	local button = Instance.new("TextButton")
+	button.Size = UDim2.new(1, -10, 0, 30)
+	button.BackgroundColor3 = Color3.fromRGB(68, 71, 90)
+	button.TextColor3 = Color3.fromRGB(248, 248, 242)
+	button.TextSize = 16
+	button.Font = Enum.Font.GothamSemibold
+	button.Text = name
+	button.Parent = dropdownFrame
+	button.LayoutOrder = #dropdownFrame:GetChildren()
+
+	-- Add rounded corners to button
+	local buttonCorner = Instance.new("UICorner")
+	buttonCorner.CornerRadius = UDim.new(0, 6)
+	buttonCorner.Parent = button
+
+	-- Hover effects
+	button.MouseEnter:Connect(function()
+		TweenService:Create(button, TweenInfo.new(0.2), {
+			BackgroundColor3 = Color3.fromRGB(78, 81, 100)
+		}):Play()
+	end)
+
+	button.MouseLeave:Connect(function()
+		TweenService:Create(button, TweenInfo.new(0.2), {
+			BackgroundColor3 = Color3.fromRGB(68, 71, 90)
+		}):Play()
+	end)
+
+	-- Click handler for teleportation
+	button.MouseButton1Click:Connect(function()
+		teleportPlayer(position)
+		teleportButton.Text = "Teleport"
+		teleportButton.BackgroundColor3 = Color3.fromRGB(68, 71, 90)
+		dropdownFrame.Visible = false -- Hide dropdown after teleporting
+		print("Teleported to: " .. name)
+	end)
+end
+
+-- Create buttons for all locations
+for locationName, locationCFrame in pairs(locations) do
+	createLocationButton(locationName, locationCFrame)
+end
+
+-- Auto-adjust frame height based on content
+local function updateDropdownHeight()
+	local contentHeight = listLayout.AbsoluteContentSize.Y
+	dropdownFrame.Size = UDim2.new(0.9, 0, 0, contentHeight + 20)
+end
+
+listLayout:GetPropertyChangedSignal("AbsoluteContentSize"):Connect(updateDropdownHeight)
+updateDropdownHeight()
+
+-- Toggle dropdown visibility only with teleport button
+teleportButton.MouseButton1Click:Connect(function()
+	dropdownFrame.Visible = not dropdownFrame.Visible
+
+	if dropdownFrame.Visible == true then
+		teleportButton.Text = "Teleport Hide"
+	else
+		teleportButton.Text = "Teleport"
+	end
+end)
+
+-- Parent dropdown frame to main frame
+dropdownFrame.Parent = mainFrame
+
+-- GUI Cleanup on Respawn
+game.Players.LocalPlayer.CharacterAdded:Connect(function(newCharacter)
+	character = newCharacter
+	if isHealthRegenActive then toggleHealthRegen() toggleHealthRegen() end
+end)
+
+-- Function to create a dropdown for selecting fruits
+local function createFruitDropdown(parentFrame, position, size)
+	-- Dropdown for Fruits
+	local dropdownFrame = Instance.new("Frame")
+	dropdownFrame.Size = size or UDim2.new(0.9, 0, 0.3, 0)
+	dropdownFrame.Position = position or UDim2.new(-0.93, 0, 0.005, 130)
+	dropdownFrame.BackgroundColor3 = Color3.fromRGB(35, 37, 49)
+	dropdownFrame.BorderSizePixel = 0
+	dropdownFrame.Visible = false
+	dropdownFrame.Parent = parentFrame
+
+	local dropdownCorner = Instance.new("UICorner")
+	dropdownCorner.CornerRadius = UDim.new(0.05, 0)
+	dropdownCorner.Parent = dropdownFrame
+
+	-- Create a ScrollingFrame to hold fruit buttons
+	local scrollFrame = Instance.new("ScrollingFrame")
+	scrollFrame.Size = UDim2.new(1, 0, 0.85, 0)
+	scrollFrame.Position = UDim2.new(0, 0, 0.05, 0)
+	scrollFrame.BackgroundTransparency = 1
+	scrollFrame.ScrollBarThickness = 6
+	scrollFrame.CanvasSize = UDim2.new(0, 0, 1, 0)
+	scrollFrame.Parent = dropdownFrame
+
+	-- Center the scrolling frame's contents
+	local listLayout = Instance.new("UIListLayout")
+	listLayout.SortOrder = Enum.SortOrder.LayoutOrder
+	listLayout.HorizontalAlignment = Enum.HorizontalAlignment.Center
+	listLayout.VerticalAlignment = Enum.VerticalAlignment.Top
+	listLayout.Padding = UDim.new(0.01, 0)
+	listLayout.Parent = scrollFrame
+
+	-- Add a button to start/stop spinning
+	local toggleSpinButton = Instance.new("TextButton")
+	toggleSpinButton.Size = UDim2.new(0.9, 0, 0, 40)
+	toggleSpinButton.Position = UDim2.new(0.05, 0, 1.05, 0)
+	toggleSpinButton.Text = "Start Spinning"
+	toggleSpinButton.BackgroundColor3 = Color3.fromRGB(80, 120, 200)
+	toggleSpinButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+	toggleSpinButton.Font = Enum.Font.GothamBold
+	toggleSpinButton.TextSize = 16
+	toggleSpinButton.Parent = dropdownFrame
+
+	local toggleSpinButtonCorner = Instance.new("UICorner")
+	toggleSpinButtonCorner.CornerRadius = UDim.new(0.15, 0)
+	toggleSpinButtonCorner.Parent = toggleSpinButton
+
+	-- Fruit selection logic
+	local wantedFruits = {}
+	local fruitList = {
+		"TSRubber",
+		"Gravity",
+		"Quake",
+		"Phoenix",
+		"FlameV2",
+		"MagmaV2",
+		"Dough",
+		"Dragon",
+		"DragonV2",
+		"Magnet",
+		"Venom",
+		"IceV2",
+		"LightV2",
+		"Lightning",
+		"Leopard",
+		"Ope",
+		"Nika",
+		"Soul",
+		"DarkXQuake",
+		"Okuchi",
+	}
+
+	-- Create fruit buttons with toggle functionality inside scrollFrame
+	for _, fruit in ipairs(fruitList) do
+		local button = Instance.new("TextButton")
+		button.Size = UDim2.new(1, -10, 0, 30)
+		button.BackgroundColor3 = Color3.fromRGB(68, 71, 90)
+		button.TextColor3 = Color3.fromRGB(248, 248, 242)
+		button.TextSize = 16
+		button.Font = Enum.Font.GothamSemibold
+		button.Text = fruit
+		button.Parent = scrollFrame
+
+		-- Add rounded corners
+		local buttonCorner = Instance.new("UICorner")
+		buttonCorner.CornerRadius = UDim.new(0, 6)
+		buttonCorner.Parent = button
+
+		-- Toggle button state and update wantedFruits
+		local isActive = false
+		button.MouseButton1Click:Connect(function()
+			isActive = not isActive
+			if isActive then
+				button.BackgroundColor3 = Color3.fromRGB(80, 200, 120) -- Active color (green)
+				table.insert(wantedFruits, fruit)
+			else
+				button.BackgroundColor3 = Color3.fromRGB(68, 71, 90) -- Inactive color
+				for i, v in ipairs(wantedFruits) do
+					if v == fruit then
+						table.remove(wantedFruits, i)
+						break
+					end
+				end
+			end
+		end)
+	end
+
+	-- Update scrollFrame CanvasSize based on content
+	local function updateCanvasSize()
+		scrollFrame.CanvasSize = UDim2.new(0, 0, 0, listLayout.AbsoluteContentSize.Y)
+	end
+	listLayout:GetPropertyChangedSignal("AbsoluteContentSize"):Connect(updateCanvasSize)
+	updateCanvasSize()
+
+	-- Create the dropdown toggle button
+	local dropdownToggleButton = fruitsDropdownButton
+
+	-- Toggle dropdown visibility with animation
+	dropdownToggleButton.MouseButton1Click:Connect(function()
+		if dropdownFrame.Visible then
+			dropdownToggleButton.Text = "Spin Fruits"
+		else
+			dropdownToggleButton.Text = "Hide Spin Fruits"
+		end
+		dropdownFrame.Visible = not dropdownFrame.Visible
+	end)
+
+	-- Define spinning state and function reference
+	local spinning = false
+	local spinCoroutine
+
+	-- Instruction label to inform the player
+	local instructionLabel = Instance.new("TextLabel")
+	instructionLabel.Size = UDim2.new(1, 0, 0, 20)
+	instructionLabel.Position = UDim2.new(0, 0, -0.15, 0)
+	instructionLabel.Text = ""
+	instructionLabel.TextColor3 = Color3.fromRGB(255, 0, 0)
+	instructionLabel.TextSize = 14
+	instructionLabel.BackgroundTransparency = 1
+	instructionLabel.Parent = dropdownFrame
+
+	-- Function to handle the spinning process
+	local function spinForWantedFruits()
+		local target = game:GetService("ReplicatedStorage").Replicator
+		local spinCommand = { "FruitsHandler", "Spin", {} }
+
+		-- Coroutine to manage spinning
+		spinCoroutine = coroutine.create(function()
+			while spinning do
+				local foundWantedFruit = false
+				for slot = 1, 8 do -- Check all 8 slots
+					local success, currFruit = pcall(function()
+						return game.Players.LocalPlayer["MAIN_DATA"].Slots[tostring(slot)].Value
+					end)
+
+					if not success then
+						wait(2) -- Wait before retrying
+						continue
+					end
+
+					-- Check if current fruit in slot matches any in wantedFruits (case-insensitive)
+					for _, wantedFruit in ipairs(wantedFruits) do
+						if string.lower(currFruit) == string.lower(wantedFruit) then
+							foundWantedFruit = true
+							break
+						end
+					end
+
+					if foundWantedFruit then break end
+				end
+
+				-- Stop spinning if we found a wanted fruit
+				if foundWantedFruit then
+					print("Acquired a desired fruit!")
+					spinning = false
+					toggleSpinButton.Text = "Start Spinning"
+					toggleSpinButton.BackgroundColor3 = Color3.fromRGB(80, 120, 200)
+					instructionLabel.Text = "You have acquired a wanted fruit. Remove it to spin again."
+					return
+				end
+
+				-- Attempt to spin and check for errors
+				local spinSuccess = pcall(function()
+					target:InvokeServer(unpack(spinCommand))
+				end)
+
+				if not spinSuccess then
+					print("Spin attempt failed, retrying...")
+					wait(2) -- Wait before retrying spin
+					continue
+				end
+
+				wait(5.5) -- Delay between spins to prevent server overload
+			end
+		end)
+
+		coroutine.resume(spinCoroutine)
+	end
+
+	-- Toggle spinning state with the button
+	toggleSpinButton.MouseButton1Click:Connect(function()
+		local hasWantedFruit = false
+		for slot = 1, 8 do
+			local success, currFruit = pcall(function()
+				return game.Players.LocalPlayer["MAIN_DATA"].Slots[tostring(slot)].Value
+			end)
+
+			if success then
+				for _, wantedFruit in ipairs(wantedFruits) do
+					if string.lower(currFruit) == string.lower(wantedFruit) then
+						hasWantedFruit = true
+						break
+					end
+				end
+			end
+
+			if hasWantedFruit then
+				instructionLabel.Text = "You already have a wanted fruit. Remove it to spin again."
+				return
+			end
+		end
+
+		if spinning then
+			spinning = false
+			toggleSpinButton.Text = "Start Spinning"
+			toggleSpinButton.BackgroundColor3 = Color3.fromRGB(80, 120, 200)
+			instructionLabel.Text = ""
+			print("Spinning stopped.")
+		else
+			if #wantedFruits > 0 then
+				spinning = true
+				toggleSpinButton.Text = "Stop Spinning"
+				toggleSpinButton.BackgroundColor3 = Color3.fromRGB(200, 80, 80)
+				instructionLabel.Text = ""
+				print("Spinning started.")
+				spinForWantedFruits()
+			else
+				instructionLabel.Text = "Select at least one fruit to start spinning."
+			end
+		end
+	end)
+end
+
+spamButton.MouseButton1Click:Connect(toggleSpam)
+speedButton.MouseButton1Click:Connect(toggleSpeedBoost)
+jumpButton.MouseButton1Click:Connect(toggleJumpBoost)
+redeemCodesButton.MouseButton1Click:Connect(redeemCodesFunc)
+healthRegenButton.MouseButton1Click:Connect(toggleHealthRegen)
+fruitsDropdownButton.MouseButton1Click:Connect(createFruitDropdown(mainFrame, UDim2.new(-0.93, 0, 0.005, 130), UDim2.new(0.9, 0, 0.3, 0)))
+closeButton.MouseButton1Click:Connect(function()
+	mainFrame:Destroy()
+end)
+
+-- Update screen center if viewport size changes
+workspace.CurrentCamera:GetPropertyChangedSignal("ViewportSize"):Connect(function()
+	viewport = workspace.CurrentCamera.ViewportSize
+	screenCenter = Vector2.new(viewport.X / 2, viewport.Y / 2)
+end)
