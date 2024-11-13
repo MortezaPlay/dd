@@ -511,13 +511,11 @@ local keySequence = {Enum.KeyCode.One, Enum.KeyCode.Two, Enum.KeyCode.Three, Enu
 local keyIndex = 1
 local isSpamActive = false
 local autoFarmThread
+local positionLockThread
 
 -- Optimize click simulation with pre-calculated position
 local screenSize = workspace.CurrentCamera.ViewportSize
-local clickPos = Vector2.new(
-	screenSize.X * 0.95,
-	screenSize.Y * 0.95
-)
+local clickPos = Vector2.new(screenSize.X * 0.95, screenSize.Y * 0.95)
 
 -- Optimized simulation functions
 local function simulateClick()
@@ -526,7 +524,6 @@ local function simulateClick()
 end
 
 local function simulateKeyPressAndClick(keyCode)
-	-- Press the key and click right after
 	VirtualInputManager:SendKeyEvent(true, keyCode, false, game)
 	VirtualInputManager:SendKeyEvent(false, keyCode, false, game)
 	simulateClick()
@@ -559,8 +556,8 @@ local function spamKeysAndClick()
 	end
 end
 
--- Function to safely teleport player
-local function teleportPlayer(position)
+-- Function to safely teleport player and anchor over platform
+local function teleportAndAnchorPlayer(position)
 	local player = game.Players.LocalPlayer
 	if not player then return end
 
@@ -568,7 +565,26 @@ local function teleportPlayer(position)
 	local humanoidRootPart = character:FindFirstChild("HumanoidRootPart")
 	if humanoidRootPart then
 		humanoidRootPart.CFrame = position
+		task.wait(0.5)  -- Give time to stabilize position
+		humanoidRootPart.Anchored = true
 	end
+end
+
+-- Function to lock player position while auto-farming
+local function lockPlayerPosition(position)
+	positionLockThread = task.spawn(function()
+		local player = game.Players.LocalPlayer
+		local character = player.Character or player.CharacterAdded:Wait()
+		local humanoidRootPart = character:WaitForChild("HumanoidRootPart")
+
+		while isSpamActive do
+			if humanoidRootPart.Position ~= position.Position then
+				humanoidRootPart.CFrame = position
+				humanoidRootPart.Anchored = true
+			end
+			task.wait(0.1)  -- Frequency of position checking
+		end
+	end)
 end
 
 -- Main toggle function with safe teleport
@@ -579,40 +595,35 @@ local function toggleSpam()
 	local hrm = character:WaitForChild("HumanoidRootPart")
 	if not hrm then return end
 
+	local initialPosition = hrm.Position
+
 	if isSpamActive then
-		-- Turn off
 		isSpamActive = false
 		spamButton.Text = "Auto farm"
 		if autoFarmThread then
 			task.cancel(autoFarmThread)
 			autoFarmThread = nil
 		end
+		if positionLockThread then
+			task.cancel(positionLockThread)
+			positionLockThread = nil
+		end
 		cleanupPlatform()
-
-		-- Un-anchor player when deactivating
 		hrm.Anchored = false
+		hrm.CFrame = CFrame.new(initialPosition)
 	else
-		-- Turn on
 		isSpamActive = true
 		spamButton.Text = "Auto farm Active"
 		
-		-- Setup platform and position
 		local newPosition = Vector3.new(5000, 5000, 0)
 		local platformPosition = newPosition - Vector3.new(0, character.Humanoid.HipHeight + 7, 0)
 		createPlatform(platformPosition)
 
-		-- Use safe teleport
-		teleportPlayer(CFrame.new(newPosition))
+		local targetPosition = CFrame.new(newPosition)
+		teleportAndAnchorPlayer(targetPosition)
+		lockPlayerPosition(targetPosition)
 
-		-- Anchor the player once they've been teleported
-		hrm.Anchored = true
-
-		-- Start key and click spamming in separate thread
 		autoFarmThread = task.spawn(spamKeysAndClick)
-
-		-- Keep the player anchored after teleportation
-		task.wait(0.5)  -- Give some time for teleportation to complete
-		hrm.Anchored = true
 	end
 end
 
@@ -627,12 +638,10 @@ end)
 game.Players.LocalPlayer.CharacterAdded:Connect(function(newCharacter)
 	character = newCharacter
 	if isSpamActive then
-		-- Toggle spam to reapply the anchored state and position the player correctly
 		toggleSpam()
 		toggleSpam() -- Double call ensures proper restart in case of respawn
 	end
 end)
-
 
 --redeem Codes function
 local function redeemCodesFunc()
