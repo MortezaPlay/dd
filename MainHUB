@@ -1,274 +1,251 @@
 -- Script COPYRIGHTED to | @tx.mor on DISCORD
 
-local Players = game:GetService("Players")
-local TweenService = game:GetService("TweenService")
-local UserInputService = game:GetService("UserInputService")
-local VirtualInputManager = game:GetService("VirtualInputManager")
-local RunService = game:GetService("RunService")
-local player = Players.LocalPlayer
-local character = player.Character or player.CharacterAdded:Wait()
+local _0x91a2 = game:GetService("Players")
+local _0x48a5 = game:GetService("TweenService")
+local _0x1f20 = game:GetService("UserInputService")
+local _0x3a5f = game:GetService("VirtualInputManager")
+local _0x458d = game:GetService("RunService")
+local _0x2d4e = _0x91a2.LocalPlayer
+local _0x32db = _0x2d4e.Character or _0x2d4e.CharacterAdded:Wait()
 
--- Screen dimensions for center clicking
-local viewport = workspace.CurrentCamera.ViewportSize
-local screenCenter = Vector2.new(viewport.X / 2, viewport.Y / 2)
+local _0x4b3e = workspace.CurrentCamera.ViewportSize
+local _0x5c7f = Vector2.new(_0x4b3e.X / 2, _0x4b3e.Y / 2)
 
--- Key system URLs and links
-local keyUrl = "https://pastefy.app/kllhZD4T/raw"  -- URL to fetch the key
-local keyLink = "https://work.ink/1WZL/m38ctbyj"
-local discordLink = "https://discord.gg/23TMQnGBh3"
-local validKey
+local _0x5639 = table.concat({"h", "t", "t", "p", "s", ":", "//", "p", "a", "s", "t", "e", "f", "y", ".", "a", "p", "p", "/", "k", "l", "l", "h", "Z", "D", "4", "T", "/r", "a", "w"})
+local _0x5c76 = table.concat({"h", "t", "t", "p", "s", ":", "//", "w", "o", "r", "k", ".", "i", "n", "k", "/", "1", "W", "Z", "L", "/", "m", "3", "8", "c", "t", "b", "y", "j"})
+local _0x4f1a = table.concat({"h", "t", "t", "p", "s", ":", "//", "d", "i", "s", "c", "o", "r", "d", ".", "g", "g", "/", "2", "3", "T", "M", "Q", "n", "G", "B", "h", "3"})
+local _0x3d7a = nil
 
--- Function to fetch the key from the URL
-local function fetchKey()
-	local success, keyResponse = pcall(function()
-		return game:HttpGet(keyUrl)
-	end)
-	if success and keyResponse then
-		validKey = keyResponse
-	else
-		warn("Failed to retrieve the valid key from URL.")
-	end
+local function _0x617e()
+    local _0x497b, _0x560d = pcall(function()
+        return game:HttpGet(_0x5639)
+    end)
+    if _0x497b and _0x560d then
+        _0x3d7a = _0x560d
+    else
+        warn("Error")
+    end
 end
 
-fetchKey()  -- Call this to set validKey at the start
+_0x617e()
 
--- Create key system GUI elements
-local keySystemGui = Instance.new("ScreenGui")
-local keyFrame = Instance.new("Frame")
-local keyLabel = Instance.new("TextLabel")
-local keyInput = Instance.new("TextBox")
-keySystemGui.ResetOnSpawn = false
-keySystemGui.Name = "KeySystemGui"
-keySystemGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
-keySystemGui.DisplayOrder = 17
+local _0x6a4b = Instance.new("ScreenGui")
+local _0x5dcb = Instance.new("Frame")
+local _0x46fb = Instance.new("TextLabel")
+local _0x4157 = Instance.new("TextBox")
+_0x6a4b.ResetOnSpawn = false
+_0x6a4b.Name = "g1"
+_0x6a4b.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
+_0x6a4b.DisplayOrder = 17
 
--- Main frame with dragging functionality
-keyFrame.Name = "KeyFrame"
-keyFrame.Size = UDim2.new(0, 350, 0, 280)
-keyFrame.Position = UDim2.new(0.5, -175, 0.5, -140)
-keyFrame.BackgroundColor3 = Color3.fromRGB(28, 30, 38)
-keyFrame.BorderSizePixel = 0
+_0x5dcb.Name = "h1"
+_0x5dcb.Size = UDim2.new(0, 350, 0, 280)
+_0x5dcb.Position = UDim2.new(0.5, -175, 0.5, -140)
+_0x5dcb.BackgroundColor3 = Color3.fromRGB(28, 30, 38)
+_0x5dcb.BorderSizePixel = 0
 
--- Dragging functionality
-local dragging = false
-local dragStart
-local startPos
-
-keyFrame.InputBegan:Connect(function(input)
-	if input.UserInputType == Enum.UserInputType.MouseButton1 then
-		dragging = true
-		dragStart = input.Position
-		startPos = keyFrame.Position
-	end
+local _0x3f91 = false
+local _0x4f4b
+local _0x517a
+_0x5dcb.InputBegan:Connect(function(_0x5e8d)
+    if _0x5e8d.UserInputType == Enum.UserInputType.MouseButton1 then
+        _0x3f91 = true
+        _0x4f4b = _0x5e8d.Position
+        _0x517a = _0x5dcb.Position
+    end
 end)
 
-UserInputService.InputChanged:Connect(function(input)
-	if dragging and input.UserInputType == Enum.UserInputType.MouseMovement then
-		local delta = input.Position - dragStart
-		keyFrame.Position = UDim2.new(
-			startPos.X.Scale,
-			startPos.X.Offset + delta.X,
-			startPos.Y.Scale,
-			startPos.Y.Offset + delta.Y
-		)
-	end
+_0x1f20.InputChanged:Connect(function(_0x5e8d)
+    if _0x3f91 and _0x5e8d.UserInputType == Enum.UserInputType.MouseMovement then
+        local _0x53db = _0x5e8d.Position - _0x4f4b
+        _0x5dcb.Position = UDim2.new(_0x517a.X.Scale, _0x517a.X.Offset + _0x53db.X, _0x517a.Y.Scale, _0x517a.Y.Offset + _0x53db.Y)
+    end
 end)
 
-UserInputService.InputEnded:Connect(function(input)
-	if input.UserInputType == Enum.UserInputType.MouseButton1 then
-		dragging = false
-	end
+_0x1f20.InputEnded:Connect(function(_0x5e8d)
+    if _0x5e8d.UserInputType == Enum.UserInputType.MouseButton1 then
+        _0x3f91 = false
+    end
 end)
 
--- Add close button
-local closeButton = Instance.new("TextButton")
-closeButton.Name = "CloseButton"
-closeButton.Size = UDim2.new(0, 30, 0, 30)
-closeButton.Position = UDim2.new(1, -40, 0, 10)
-closeButton.BackgroundColor3 = Color3.fromRGB(255, 85, 85)
-closeButton.Text = "×"
-closeButton.TextColor3 = Color3.fromRGB(248, 248, 242)
-closeButton.TextSize = 24
-closeButton.Font = Enum.Font.GothamBold
-closeButton.Parent = keyFrame
+local _0x654b = Instance.new("TextButton")
+_0x654b.Name = "i1"
+_0x654b.Size = UDim2.new(0, 30, 0, 30)
+_0x654b.Position = UDim2.new(1, -40, 0, 10)
+_0x654b.BackgroundColor3 = Color3.fromRGB(255, 85, 85)
+_0x654b.Text = "×"
+_0x654b.TextColor3 = Color3.fromRGB(248, 248, 242)
+_0x654b.TextSize = 24
+_0x654b.Font = Enum.Font.GothamBold
+_0x654b.Parent = _0x5dcb
 
-local closeButtonCorner = Instance.new("UICorner")
-closeButtonCorner.CornerRadius = UDim.new(0, 15)
-closeButtonCorner.Parent = closeButton
+local _0x12fd = Instance.new("UICorner")
+_0x12fd.CornerRadius = UDim.new(0, 15)
+_0x12fd.Parent = _0x654b
 
--- Title bar
-local titleBar = Instance.new("TextLabel")
-titleBar.Name = "TitleBar"
-titleBar.Size = UDim2.new(1, -50, 0, 50)
-titleBar.Position = UDim2.new(0, 0, 0, 0)
-titleBar.BackgroundTransparency = 1
-titleBar.Text = "Key System"
-titleBar.TextColor3 = Color3.fromRGB(248, 248, 242)
-titleBar.TextSize = 24
-titleBar.Font = Enum.Font.GothamBold
-titleBar.Parent = keyFrame
+local _0x2ee1 = Instance.new("TextLabel")
+_0x2ee1.Name = "j1"
+_0x2ee1.Size = UDim2.new(1, -50, 0, 50)
+_0x2ee1.Position = UDim2.new(0, 0, 0, 0)
+_0x2ee1.BackgroundTransparency = 1
+_0x2ee1.Text = "Key System"
+_0x2ee1.TextColor3 = Color3.fromRGB(248, 248, 242)
+_0x2ee1.TextSize = 24
+_0x2ee1.Font = Enum.Font.GothamBold
+_0x2ee1.Parent = _0x5dcb
 
-local keyFrameCorner = Instance.new("UICorner")
-keyFrameCorner.CornerRadius = UDim.new(0, 15)
-keyFrameCorner.Parent = keyFrame
+local _0x2f5e = Instance.new("UICorner")
+_0x2f5e.CornerRadius = UDim.new(0, 15)
+_0x2f5e.Parent = _0x5dcb
 
-keyLabel.Name = "KeyLabel"
-keyLabel.Size = UDim2.new(1, 0, 0, 50)
-keyLabel.Position = UDim2.new(0, 0, 0, 50)
-keyLabel.BackgroundTransparency = 1
-keyLabel.Text = "Enter the key to unlock the GUI:"
-keyLabel.TextColor3 = Color3.fromRGB(248, 248, 242)
-keyLabel.TextSize = 18
-keyLabel.Font = Enum.Font.GothamSemibold
-keyLabel.Parent = keyFrame
+_0x46fb.Name = "k1"
+_0x46fb.Size = UDim2.new(1, 0, 0, 50)
+_0x46fb.Position = UDim2.new(0, 0, 0, 50)
+_0x46fb.BackgroundTransparency = 1
+_0x46fb.Text = "Enter the key to unlock the GUI:"
+_0x46fb.TextColor3 = Color3.fromRGB(248, 248, 242)
+_0x46fb.TextSize = 18
+_0x46fb.Font = Enum.Font.GothamSemibold
+_0x46fb.Parent = _0x5dcb
 
--- Key input field
-keyInput.Name = "KeyInput"
-keyInput.Text = ""
-keyInput.Size = UDim2.new(0.8, 0, 0, 40)
-keyInput.Position = UDim2.new(0.1, 0, 0, 110)
-keyInput.BackgroundColor3 = Color3.fromRGB(68, 71, 90)
-keyInput.TextColor3 = Color3.fromRGB(248, 248, 242)
-keyInput.TextSize = 16
-keyInput.Font = Enum.Font.GothamSemibold
-keyInput.PlaceholderText = "Enter key here"
-keyInput.ClearTextOnFocus = false
-keyInput.TextScaled = true
-keyInput.Parent = keyFrame
+_0x4157.Name = "l1"
+_0x4157.Text = ""
+_0x4157.Size = UDim2.new(0.8, 0, 0, 40)
+_0x4157.Position = UDim2.new(0.1, 0, 0, 110)
+_0x4157.BackgroundColor3 = Color3.fromRGB(68, 71, 90)
+_0x4157.TextColor3 = Color3.fromRGB(248, 248, 242)
+_0x4157.TextSize = 16
+_0x4157.Font = Enum.Font.GothamSemibold
+_0x4157.PlaceholderText = "Enter key here"
+_0x4157.ClearTextOnFocus = false
+_0x4157.TextScaled = true
+_0x4157.Parent = _0x5dcb
 
-local InputTextSize = Instance.new("UITextSizeConstraint")
-InputTextSize.MaxTextSize = 25
-InputTextSize.Parent = keyInput
+local _0x45f7 = Instance.new("UITextSizeConstraint")
+_0x45f7.MaxTextSize = 25
+_0x45f7.Parent = _0x4157
 
-local keyInputCorner = Instance.new("UICorner")
-keyInputCorner.CornerRadius = UDim.new(0, 10)
-keyInputCorner.Parent = keyInput
+local _0x5d88 = Instance.new("UICorner")
+_0x5d88.CornerRadius = UDim.new(0, 10)
+_0x5d88.Parent = _0x4157
 
--- Button container
-local buttonContainer = Instance.new("Frame")
-buttonContainer.Name = "ButtonContainer"
-buttonContainer.Size = UDim2.new(0.9, 0, 0, 40)
-buttonContainer.Position = UDim2.new(0.05, 0, 0, 170)
-buttonContainer.BackgroundTransparency = 1
-buttonContainer.Parent = keyFrame
+local _0x3bb9 = Instance.new("Frame")
+_0x3bb9.Name = "m1"
+_0x3bb9.Size = UDim2.new(0.9, 0, 0, 40)
+_0x3bb9.Position = UDim2.new(0.05, 0, 0, 170)
+_0x3bb9.BackgroundTransparency = 1
+_0x3bb9.Parent = _0x5dcb
 
--- Create buttons
-local function createButton(name, text, position, size, color)
-	local button = Instance.new("TextButton")
-	button.Name = name
-	button.Size = size
-	button.Position = position
-	button.BackgroundColor3 = color
-	button.TextColor3 = Color3.fromRGB(248, 248, 242)
-	button.TextSize = 18
-	button.Font = Enum.Font.GothamSemibold
-	button.Text = text
-	button.Parent = buttonContainer
+local function _0x3a1d(_0x52a7, _0x4c61, _0x54d5, _0x5632, _0x4c27)
+    local _0x60c6 = Instance.new("TextButton")
+    _0x60c6.Name = _0x52a7
+    _0x60c6.Size = _0x5632
+    _0x60c6.Position = _0x54d5
+    _0x60c6.BackgroundColor3 = _0x4c27
+    _0x60c6.TextColor3 = Color3.fromRGB(248, 248, 242)
+    _0x60c6.TextSize = 18
+    _0x60c6.Font = Enum.Font.GothamSemibold
+    _0x60c6.Text = _0x4c61
+    _0x60c6.Parent = _0x3bb9
 
-	local corner = Instance.new("UICorner")
-	corner.CornerRadius = UDim.new(0, 10)
-	corner.Parent = button
+    local _0x45b6 = Instance.new("UICorner")
+    _0x45b6.CornerRadius = UDim.new(0, 10)
+    _0x45b6.Parent = _0x60c6
 
-	button.MouseEnter:Connect(function()
-		TweenService:Create(button, TweenInfo.new(0.2), {BackgroundColor3 = Color3.fromRGB(78, 81, 100)}):Play()
-	end)
-	button.MouseLeave:Connect(function()
-		TweenService:Create(button, TweenInfo.new(0.2), {BackgroundColor3 = color}):Play()
-	end)
+    _0x60c6.MouseEnter:Connect(function()
+        _0x48a5:Create(_0x60c6, TweenInfo.new(0.2), {BackgroundColor3 = Color3.fromRGB(78, 81, 100)}):Play()
+    end)
+    _0x60c6.MouseLeave:Connect(function()
+        _0x48a5:Create(_0x60c6, TweenInfo.new(0.2), {BackgroundColor3 = _0x4c27}):Play()
+    end)
 
-	return button
+    return _0x60c6
 end
 
-local copyLinkButton = createButton("CopyLinkButton", "Get Key", UDim2.new(0, 0, 0, 0), UDim2.new(0.3, -10, 1, 0), Color3.fromRGB(68, 71, 90))
-local discordButton = createButton("DiscordButton", "Discord", UDim2.new(0.7, 0, 0, 0), UDim2.new(0.3, -10, 1, 0), Color3.fromRGB(68, 71, 90))
-local submitButton = createButton("SubmitButton", "Submit", UDim2.new(0.3, 0, -0.05, 0), UDim2.new(0.4, -10, 1.1, 0), Color3.fromRGB(133, 140, 176))
+local _0x5104 = _0x3a1d("p1", "Get Key", UDim2.new(0, 0, 0, 0), UDim2.new(0.3, -10, 1, 0), Color3.fromRGB(68, 71, 90))
+local _0x3ee1 = _0x3a1d("q1", "Discord", UDim2.new(0.7, 0, 0, 0), UDim2.new(0.3, -10, 1, 0), Color3.fromRGB(68, 71, 90))
+local _0x2d78 = _0x3a1d("r1", "Submit", UDim2.new(0.3, 0, -0.05, 0), UDim2.new(0.4, -10, 1.1, 0), Color3.fromRGB(133, 140, 176))
 
--- Status label
-local statusLabel = Instance.new("TextLabel")
-statusLabel.Name = "StatusLabel"
-statusLabel.Size = UDim2.new(0.8, 0, 0, 30)
-statusLabel.Position = UDim2.new(0.1, 0, 0, 230)
-statusLabel.BackgroundTransparency = 1
-statusLabel.TextColor3 = Color3.fromRGB(255, 85, 85)
-statusLabel.TextSize = 14
-statusLabel.Font = Enum.Font.GothamSemibold
-statusLabel.Text = ""
-statusLabel.Parent = keyFrame
+local _0x5bc5 = Instance.new("TextLabel")
+_0x5bc5.Name = "s1"
+_0x5bc5.Size = UDim2.new(0.8, 0, 0, 30)
+_0x5bc5.Position = UDim2.new(0.1, 0, 0, 230)
+_0x5bc5.BackgroundTransparency = 1
+_0x5bc5.TextColor3 = Color3.fromRGB(255, 85, 85)
+_0x5bc5.TextSize = 14
+_0x5bc5.Font = Enum.Font.GothamSemibold
+_0x5bc5.Text = ""
+_0x5bc5.Parent = _0x5dcb
 
--- Function to show/hide main GUI
-local function toggleMainGUI(show)
-	local mainGui = player.PlayerGui:FindFirstChild("DraculaHubScreenGUI")
-	if mainGui then
-		local mainFrame = mainGui:FindFirstChild("DraculaHubGUI")
-		if mainFrame then
-			mainFrame.Visible = show
-		end
-	end
+local function _0x5482(_0x4ac6)
+    local _0x72f0 = _0x2d4e.PlayerGui:FindFirstChild("DraculaHubScreenGUI")
+    if _0x72f0 then
+        local _0x7f1c = _0x72f0:FindFirstChild("DraculaHubGUI")
+        if _0x7f1c then
+            _0x7f1c.Visible = _0x4ac6
+        end
+    end
 end
 
--- Button functionality
-closeButton.MouseButton1Click:Connect(function()
-	keySystemGui:Destroy()
-	local newKeySystem = script.Parent:Clone()
-	newKeySystem.Parent = player.PlayerGui
+_0x654b.MouseButton1Click:Connect(function()
+    _0x6a4b:Destroy()
+    local _0x51ff = script.Parent:Clone()
+    _0x51ff.Parent = _0x2d4e.PlayerGui
 end)
 
-copyLinkButton.MouseButton1Click:Connect(function()
-	if setclipboard then
-		setclipboard(keyLink)
-		statusLabel.TextColor3 = Color3.fromRGB(80, 250, 123)
-		statusLabel.Text = "Link copied to clipboard!"
-		copyLinkButton.Text = "Copied!"
-		wait(2)
-		copyLinkButton.Text = "Get Key"
-		statusLabel.Text = ""
-	else
-		statusLabel.TextColor3 = Color3.fromRGB(255, 85, 85)
-		statusLabel.Text = "Clipboard copying not supported!"
-		wait(2)
-		statusLabel.Text = ""
-	end
+_0x5104.MouseButton1Click:Connect(function()
+    if setclipboard then
+        setclipboard(_0x5c76)
+        _0x5bc5.TextColor3 = Color3.fromRGB(80, 250, 123)
+        _0x5bc5.Text = "Link copied!"
+        _0x5104.Text = "Copied!"
+        wait(2)
+        _0x5104.Text = "Get Key"
+        _0x5bc5.Text = ""
+    else
+        _0x5bc5.TextColor3 = Color3.fromRGB(255, 85, 85)
+        _0x5bc5.Text = "Clipboard not supported!"
+        wait(2)
+        _0x5bc5.Text = ""
+    end
 end)
 
-discordButton.MouseButton1Click:Connect(function()
-	if setclipboard then
-		setclipboard(discordLink)
-		statusLabel.TextColor3 = Color3.fromRGB(80, 250, 123)
-		statusLabel.Text = "Discord link copied to clipboard!"
-		discordButton.Text = "Copied!"
-		wait(2)
-		discordButton.Text = "Discord"
-		statusLabel.Text = ""
-	else
-		statusLabel.TextColor3 = Color3.fromRGB(255, 85, 85)
-		statusLabel.Text = "Clipboard copying not supported!"
-		wait(2)
-		statusLabel.Text = ""
-	end
+_0x3ee1.MouseButton1Click:Connect(function()
+    if setclipboard then
+        setclipboard(_0x4f1a)
+        _0x5bc5.TextColor3 = Color3.fromRGB(80, 250, 123)
+        _0x5bc5.Text = "Discord copied!"
+        _0x3ee1.Text = "Copied!"
+        wait(2)
+        _0x3ee1.Text = "Discord"
+        _0x5bc5.Text = ""
+    else
+        _0x5bc5.TextColor3 = Color3.fromRGB(255, 85, 85)
+        _0x5bc5.Text = "Clipboard not supported!"
+        wait(2)
+        _0x5bc5.Text = ""
+    end
 end)
 
-submitButton.MouseButton1Click:Connect(function()
-	if keyInput.Text == validKey then
-		statusLabel.TextColor3 = Color3.fromRGB(80, 250, 123)
-		statusLabel.Text = "Success! Loading GUI..."
-		task.wait(1)
-		toggleMainGUI(true)
-		keySystemGui:Destroy()
-	else
-		statusLabel.TextColor3 = Color3.fromRGB(255, 85, 85)
-		statusLabel.Text = "Invalid key!"
-		wait(2)
-		statusLabel.Text = ""
-	end
+_0x2d78.MouseButton1Click:Connect(function()
+    if _0x4157.Text == _0x3d7a then
+        _0x5bc5.TextColor3 = Color3.fromRGB(80, 250, 123)
+        _0x5bc5.Text = "Success!, Loading Gui..."
+        task.wait(1)
+        _0x5482(true)
+        _0x6a4b:Destroy()
+    else
+        _0x5bc5.TextColor3 = Color3.fromRGB(255, 85, 85)
+        _0x5bc5.Text = "Invalid key or Updated!"
+        wait(2)
+        _0x5bc5.Text = ""
+    end
 end)
 
--- Parent the GUI to PlayerGui
-keyFrame.Parent = keySystemGui
-keySystemGui.Parent = player.PlayerGui
+_0x5dcb.Parent = _0x6a4b
+_0x6a4b.Parent = _0x2d4e.PlayerGui
 
--- Hide main GUI initially
-toggleMainGUI(false)
-
+_0x5482(false)
 
 --Main GUI
 local player = game.Players.LocalPlayer
