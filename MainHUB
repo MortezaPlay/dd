@@ -236,7 +236,7 @@ _0x2d78.MouseButton1Click:Connect(function()
         _0x6a4b:Destroy()
     else
         _0x5bc5.TextColor3 = Color3.fromRGB(255, 85, 85)
-        _0x5bc5.Text = "Invalid key or Updated!"
+        _0x5bc5.Text = "Invalid key or Expired!"
         wait(2)
         _0x5bc5.Text = ""
     end
