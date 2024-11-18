@@ -332,92 +332,60 @@ separator2.Position = UDim2.new(0.05, 0,0.695, 0)
 separator2.BackgroundColor3 = Color3.fromRGB(100, 100, 100)
 separator2.BorderSizePixel = 0
 
+-- Style for each button with a Dracula-inspired theme
 local TweenService = game:GetService("TweenService")
 
--- Function to set default button properties
-local function setButtonProperties(button, text, position)
+local function styleButton(button, text, Pos, isExempt)
 	button.Size = UDim2.new(0.9, 0, 0, 50)
-	button.Position = position
-	button.BackgroundColor3 = Color3.fromRGB(68, 71, 90)  -- Dracula button color
-	button.TextColor3 = Color3.fromRGB(248, 248, 242)     -- Dracula text color
+	button.Position = Pos
+	button.BackgroundColor3 = Color3.fromRGB(68, 71, 90) -- Dracula button color
+	button.TextColor3 = Color3.fromRGB(248, 248, 242) -- Dracula text color
 	button.TextSize = 18
 	button.Font = Enum.Font.GothamSemibold
 	button.BorderSizePixel = 0
-	button.Text = text
 
-	-- Apply corner rounding
-	local corner = Instance.new("UICorner")
-	corner.CornerRadius = UDim.new(0, 10)
-	corner.Parent = button
-end
-
--- Function to handle tween animation for hover and active states
-local function createButtonTween(button, color)
-	return TweenService:Create(button, TweenInfo.new(0.2), {BackgroundColor3 = color})
-end
-
--- Main button styling function with cooldown
-local function styleButton(button, text, position, isExempt)
-	-- Set default properties
-	setButtonProperties(button, text, position)
-
-	-- Create tweens for hover and active states
-	local hoverInTween = createButtonTween(button, Color3.fromRGB(78, 81, 100))    -- Hover in color
-	local hoverOutTween = createButtonTween(button, Color3.fromRGB(68, 71, 90))    -- Hover out color
-	local activeTween = createButtonTween(button, Color3.fromRGB(80, 200, 120))    -- Active button color
-	local inactiveTween = createButtonTween(button, Color3.fromRGB(68, 71, 90))    -- Inactive button color
+	local buttonCorner = Instance.new("UICorner")
+	buttonCorner.CornerRadius = UDim.new(0, 10)
+	buttonCorner.Parent = button
 
 	-- Track whether the button is active
 	local isActive = false
-	-- Cooldown mechanism flag
-	local canClick = true
 
-	-- Hover effect (only active when not exempt)
+	-- Button hover effect
 	button.MouseEnter:Connect(function()
-		if not isActive and not isExempt then
-			hoverInTween:Play()
+		if not isActive and not isExempt then -- Only apply hover effect if the button is not active and is not exempt
+			TweenService:Create(button, TweenInfo.new(0.2), {BackgroundColor3 = Color3.fromRGB(78, 81, 100)}):Play()
 		end
 	end)
-
 	button.MouseLeave:Connect(function()
-		if not isActive and not isExempt then
-			hoverOutTween:Play()
+		if not isActive and not isExempt then -- Only revert hover effect if the button is not active and is not exempt
+			TweenService:Create(button, TweenInfo.new(0.2), {BackgroundColor3 = Color3.fromRGB(68, 71, 90)}):Play()
 		end
 	end)
 
-	-- Function to toggle button active/inactive states with cooldown
-	local function toggleButtonState()
-		if not canClick then return end  -- Exit if cooldown is active
-		if isExempt then return end  -- Exempt buttons don't toggle color
-
-		-- Toggle active state
+	-- Button click effect
+	local function toggleButtonColor()
+		if isExempt then return end -- Don't apply color toggle if the button is exempt
 		isActive = not isActive
-
-		-- Play the appropriate tween for active/inactive state
-		if isActive then
-			activeTween:Play()
-		else
-			inactiveTween:Play()
-		end
-
-		-- Activate cooldown
-		canClick = false
-		task.wait(0.15)
-		canClick = true
+		local targetColor = isActive and Color3.fromRGB(80, 200, 120) or Color3.fromRGB(68, 71, 90)
+		TweenService:Create(button, TweenInfo.new(0.2), {BackgroundColor3 = targetColor}):Play()
 	end
 
-	-- Bind click event to toggle button state
-	button.MouseButton1Click:Connect(toggleButtonState)
+	button.MouseButton1Click:Connect(function()
+		toggleButtonColor()
+	end)
+
+	button.Text = text
 end
 
--- Example usage
-styleButton(spamButton, "Auto farm", UDim2.new(0.05, 0, 0.133, 0))
-styleButton(speedButton, "Speed Boost", UDim2.new(0.05, 0, 0.471, 0))
-styleButton(jumpButton, "Jump Boost", UDim2.new(0.05, 0, 0.578, 0))
-styleButton(redeemCodesButton, "Redeem All Codes", UDim2.new(0.05, 0, 0.322, 0), true)
-styleButton(healthRegenButton, "Health Regen", UDim2.new(0.05, 0, 0.729, 0))
-styleButton(teleportButton, "Teleport", UDim2.new(0.05, 0, 0.837, 0))
-styleButton(fruitsDropdownButton, "Spin Fruits", UDim2.new(0.05, 0, 0.228, 0))
+-- Call styleButton with an additional argument `isExempt` for the redeemCodesButton
+styleButton(spamButton, "Auto farm", UDim2.new(0.05, 0,0.133, 0))
+styleButton(speedButton, "Speed Boost", UDim2.new(0.05, 0,0.471, 0))
+styleButton(jumpButton, "Jump Boost", UDim2.new(0.05, 0,0.578, 0))
+styleButton(redeemCodesButton, "Redeem All Codes", UDim2.new(0.05, 0,0.322, 0), true)
+styleButton(healthRegenButton, "Health Regen", UDim2.new(0.05, 0,0.729, 0))
+styleButton(teleportButton, "Teleport", UDim2.new(0.05, 0,0.837, 0))
+styleButton(fruitsDropdownButton, "Spin Fruits", UDim2.new(0.05, 0,0.226, 0))
 
 -- Add rounded corners to main frames
 local mainCorner = Instance.new("UICorner")
@@ -522,21 +490,9 @@ local isSpamActive = false
 local autoFarmThread
 local positionLockThread
 
--- Optimize click simulation with pre-calculated position
+-- Optimized click simulation with pre-calculated position
 local screenSize = workspace.CurrentCamera.ViewportSize
 local clickPos = Vector2.new(screenSize.X * 0.95, screenSize.Y * 0.95)
-
--- Optimized simulation functions
-local function simulateClick()
-	VirtualInputManager:SendMouseButtonEvent(clickPos.X, clickPos.Y, 0, true, game, 0)
-	VirtualInputManager:SendMouseButtonEvent(clickPos.X, clickPos.Y, 0, false, game, 0)
-end
-
-local function simulateKeyPressAndClick(keyCode)
-	VirtualInputManager:SendKeyEvent(true, keyCode, false, game)
-	VirtualInputManager:SendKeyEvent(false, keyCode, false, game)
-	simulateClick()
-end
 
 -- Platform management functions
 local function createPlatform(position)
@@ -556,12 +512,26 @@ local function cleanupPlatform()
 	end
 end
 
+-- Mobile-friendly functions
+local function simulateClick()
+	-- Touch screen tap simulation
+	game:GetService("VirtualInputManager"):SendMouseButtonEvent(clickPos.X, clickPos.Y, 0, true, game, 0)
+	game:GetService("VirtualInputManager"):SendMouseButtonEvent(clickPos.X, clickPos.Y, 0, false, game, 0)
+end
+
+local function simulateKeyPressAndClick(keyCode)
+	-- Mobile devices do not have physical keys; adapt key events as simulated presses.
+	game:GetService("VirtualInputManager"):SendKeyEvent(true, keyCode, false, game)
+	game:GetService("VirtualInputManager"):SendKeyEvent(false, keyCode, false, game)
+	simulateClick()
+end
+
 -- Separate function for spamming keys and clicking
 local function spamKeysAndClick()
 	while isSpamActive do
 		simulateKeyPressAndClick(keySequence[keyIndex])
 		keyIndex = (keyIndex % #keySequence) + 1
-		task.wait(0.28)  -- Interval between key and click spam
+		task.wait(0.28) -- Interval between key and click spam
 	end
 end
 
@@ -574,7 +544,7 @@ local function teleportAndAnchorPlayer(position)
 	local humanoidRootPart = character:FindFirstChild("HumanoidRootPart")
 	if humanoidRootPart then
 		humanoidRootPart.CFrame = position
-		task.wait(0.5)  -- Give time to stabilize position
+		task.wait(0.5) -- Give time to stabilize position
 		humanoidRootPart.Anchored = true
 	end
 end
@@ -591,7 +561,7 @@ local function lockPlayerPosition(position)
 				humanoidRootPart.CFrame = position
 				humanoidRootPart.Anchored = true
 			end
-			task.wait(0.1)  -- Frequency of position checking
+			task.wait(0.1) -- Frequency of position checking
 		end
 	end)
 end
@@ -636,12 +606,16 @@ local function toggleSpam()
 	end
 end
 
--- Emergency stop hotkey
-UserInputService.InputBegan:Connect(function(input, gameProcessed)
-	if input.KeyCode == Enum.KeyCode.P and isSpamActive then
-		toggleSpam()
+-- Emergency stop hotkey (mobile compatible)
+local function handleInput(input, gameProcessed)
+	if input.UserInputType == Enum.UserInputType.Touch or input.KeyCode == Enum.KeyCode.P then
+		if isSpamActive then
+			toggleSpam()
+		end
 	end
-end)
+end
+
+game:GetService("UserInputService").InputBegan:Connect(handleInput)
 
 -- Cleanup on character respawn
 game.Players.LocalPlayer.CharacterAdded:Connect(function(newCharacter)
@@ -651,6 +625,7 @@ game.Players.LocalPlayer.CharacterAdded:Connect(function(newCharacter)
 		toggleSpam() -- Double call ensures proper restart in case of respawn
 	end
 end)
+
 
 --redeem Codes function
 local function redeemCodesFunc()
