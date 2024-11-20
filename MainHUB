@@ -15,7 +15,7 @@ local screenCenter = Vector2.new(viewport.X / 2, viewport.Y / 2)
 
 -- Configuration
 local Config = {
-	KeyEndpoint = "https://pastefy.app/kllhZD4T/raw",
+	KeyEndpoint = "https://pastefy.app/Mz3z3cSR/raw",
 	Links = {
 		WorkInk = "https://work.ink/1WZL/m38ctbyj",
 		LootLabs = "https://loot-link.com/s?70755ac8",
