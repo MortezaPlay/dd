@@ -989,8 +989,8 @@ local function toggleSpam()
 		isSpamActive = true
 		spamButton.Text = "Auto farm Active"
 
-		local newPosition = Vector3.new(5000, 5000, 0)
-		local platformPosition = newPosition - Vector3.new(0, character.Humanoid.HipHeight + 7, 0)
+		local newPosition = Vector3.new(math.random(5000,10000), math.random(5000,15000), math.random(5000,10000))
+		local platformPosition = newPosition - Vector3.new(0, character.Humanoid.HipHeight + 3.8, 0)
 		createPlatform(platformPosition)
 
 		local targetPosition = CFrame.new(newPosition)
